@@ -11,7 +11,7 @@ syscall
 .end_macro
 
  # Lee un caracter introducido por el teclado 
-.macro read_character 
+.macro read_character ()
 	li $v0 12
 	syscall
 .end_macro
