@@ -64,7 +64,7 @@
 	end_initiator:
 .end_macro
 
-.macro player_turn (%player_in_turn_board,%oponent_board)
+.macro player_turn (%player_in_turn_board, %oponent_board, %location_ac, %location_dn, %location_sm, %location_fgt)
 	#Cargo el tablero del jugador en turno
 	load_board (%player_in_turn_board,display_board) # Carga el valor del tablero del jugador al display
 	# En $s1 guardaré la condición de turno. Si el jugador acierta se mantiene en 1, si falla se iguala a 0
@@ -76,8 +76,15 @@
 
 		#Evaluo si tiene otro acierto
 		beqz $s1 end_loop_shot
+		
+		# Verifica si un barco ha sido hundido
+	        check_all_ships_sunk(%location_ac, %location_dn, %location_sm, %location_fgt)
+		
 		j loop_shot
 	end_loop_shot:
+	
+	#Verifico hundimiento
+	
 	#Guardo el tablero al finalizar el turno	
 	save_board (display_board, %player_in_turn_board)
 	

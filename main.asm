@@ -22,9 +22,9 @@ location_fgt1: .space 8  # Frigate = fragata = fgt.  Tamaño: 2
 
 #Player 2
 location_ac2: .space 20	# Portaaviones = Aircraft Carrier = ac.  Tamaño: 5
-location_dn2: .space 16	# dreadnought = Acorazado = dn. Tamaño: 4 
-location_sm2: .space 12  # Submarine = Submarino = sm. Tamaño: 3
-location_fgt2: .space 8  # Frigate = fragata = fgt.  Tamaño: 2
+location_dn2: .space 16	# Acorazado = Dreadnought  = dn. Tamaño: 4 
+location_sm2: .space 12 # Submarino = Submarine = sm. Tamaño: 3
+location_fgt2: .space 8  # Fragata = Frigate = fgt.  Tamaño: 2
 
 #Menu principal
 welcome: .asciiz "\n			~~~~ Bienvenido a BattleShip ~~~~"
@@ -43,8 +43,16 @@ message_fail_shot: .asciiz "\nDisparo fallido D: \n"
 message_turn_p1: .asciiz "\nTurno del jugador 1\n"
 message_turn_p2: .asciiz "\nTurno del jugador 2\n"
 
-achieved:.asciiz "\n Llegue" #<---------DEBUG MESSAGE
+aircraft_carrier_name: .asciiz "\nPortaaviones\n"
+dreadnought_name: .asciiz "\nAcorazado\n"
+submarine_name: .asciiz "\nSubmarino\n"
+frigate_name: .asciiz "\nFragata\n"
 
+sunk_message: .asciiz "¡El barco ha sido hundido: "
+victory_message: .asciiz "¡Todos los barcos han sido hundidos! ¡Ha ganado!"
+
+achieved:.asciiz "\n Llegue" #<---------DEBUG MESSAGE
+ 
 .eqv BLUE 0x0000FF
 .eqv blue 0x87CEFA
 .eqv GRAY 0x808080
@@ -66,9 +74,12 @@ initiator () 	# Arma los tableros colocando los barcos y guarda sus posiciones y
 #game ()	MACRO 	#Inician los turnos
 
 #Turno del jugador 1
+
+
 print_message(message_turn_p1) 
-player_turn (board_p1,board_p2)
+player_turn (board_p1,board_p2,location_ac2, location_dn2, location_sm2, location_fgt2)
 
 #Turno del jugador 2
+
 print_message(message_turn_p2)
-player_turn (board_p2,board_p1)
+player_turn (board_p2,board_p1,location_ac1, location_dn1, location_sm1, location_fgt1)
