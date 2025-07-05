@@ -9,10 +9,22 @@
 .data
 ###### Etiquetas ###############
 #Tablero Jugador 1 
-p1: .space 2048
+display_board: .space 2048 #Tablero que se muestra en el Bitmap Display
+board_p1: .space 2048
+board_p2: .space 2048
+# Espacios de los barcos     
 
-# Espacios de los barcos     <---------FALTAN EL RESTO DE LOS BARCOS
-location_ac: .space 4# Acorazado
+#Player 1
+location_ac1: .space 20	# Portaaviones = Aircraft Carrier = ac. Tamaño: 5
+location_dn1: .space 16	# dreadnought = Acorazado = dn. Tamaño: 4 
+location_sm1: .space 12  # Submarine = Submarino = sm. Tamaño: 3
+location_fgt1: .space 8  # Frigate = fragata = fgt.  Tamaño: 2
+
+#Player 2
+location_ac2: .space 20	# Portaaviones = Aircraft Carrier = ac.  Tamaño: 5
+location_dn2: .space 16	# dreadnought = Acorazado = dn. Tamaño: 4 
+location_sm2: .space 12  # Submarine = Submarino = sm. Tamaño: 3
+location_fgt2: .space 8  # Frigate = fragata = fgt.  Tamaño: 2
 
 #Menu principal
 welcome: .asciiz "\n			~~~~ Bienvenido a BattleShip ~~~~"
@@ -21,8 +33,16 @@ mode_1: .asciiz "\n	1. Jugador 1 vs Jugador 2."
 mode_2: .asciiz "\n	2. Jugador 1 vs CPU."
 ask_mode: .asciiz "\nIngrese el número del modo de juego o 0 para salir: " 
 next_line:.asciiz "\n"
-
+initialize_board_p1: .asciiz "\n	Jugador 1. Ubique cada uno de sus barcos:"
+initialize_board_p2: .asciiz "\n	Jugador 2. Ubique cada uno de sus barcos:"
 ask_move: .asciiz "\nElija la ubicacion:\nA->Mover a la izquierda.\nD->Mover a la derecha.\nW->Mover hacia arriba.\nS->Mover hacia abajo.\n\nCon R puede rotar el barco y con enter acepta la posición.\n"
+ask_fire: .asciiz "\nElija la ubicacion donde desea disparar:\nA->Mover a la izquierda.\nD->Mover a la derecha.\nW->Mover hacia arriba.\nS->Mover hacia abajo.\n\nCon enter acepta la posición de disparo.\n"
+invalid_fire: .asciiz "Disparo invalido. Seleccione una ubicacion a la que no haya disparado antes"
+message_successful_shot: .asciiz "\n¡Disparo exitoso!\n"
+message_fail_shot: .asciiz "\nDisparo fallido D: \n"
+message_turn_p1: .asciiz "\nTurno del jugador 1\n"
+message_turn_p2: .asciiz "\nTurno del jugador 2\n"
+
 achieved:.asciiz "\n Llegue" #<---------DEBUG MESSAGE
 
 .eqv BLUE 0x0000FF
@@ -37,17 +57,18 @@ achieved:.asciiz "\n Llegue" #<---------DEBUG MESSAGE
 .text
 
 # Muestro el menu
-#	main_menu (print_message, read_character,stop_program) # Nos da la eleccion del jugador
+main_menu (print_message, read_character,stop_program) # Nos da la eleccion del jugador en $v0
 
-# Inicia el modo de juego elegido
-#initiator ()
+# Preparo el modo de juego elegido
+initiator () 	# Arma los tableros colocando los barcos y guarda sus posiciones y cada tablero en board_p1 y board_p2
 
-# Pintamos azul ambos tableros ( TODO: COLOCAR P2, RESERVAR MEMORIA ARRIBA )
-print_ocean(p1)
+#Inicio el modo de juego
+#game ()	MACRO 	#Inician los turnos
 
-#place_boat (5) 	# COLOCAR LOS DEMAS BARCOS 
-#place_boat (4) # Quitar el # 
+#Turno del jugador 1
+print_message(message_turn_p1) 
+player_turn (board_p1,board_p2)
 
-move_cursor (p1)
-	
-#print_message (achieved)
+#Turno del jugador 2
+print_message(message_turn_p2)
+player_turn (board_p2,board_p1)

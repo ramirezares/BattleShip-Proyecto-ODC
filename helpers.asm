@@ -10,6 +10,15 @@
 syscall
 .end_macro
 
+# Función utilizada para debuggear imprimiendo los numeros
+# que se guardaron en la memoria de los barcos
+.macro print_number_in_memory (%ship_memory) 
+	li $t1 0
+	lw $a0 %ship_memory($t1)
+	li $v0 1
+	syscall
+.end_macro
+
  # Lee un caracter introducido por el teclado 
 .macro read_character ()
 	li $v0 12
