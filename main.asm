@@ -43,14 +43,15 @@ message_fail_shot: .asciiz "\nDisparo fallido D: \n"
 message_turn_p1: .asciiz "\nTurno del jugador 1\n"
 message_turn_p2: .asciiz "\nTurno del jugador 2\n"
 
-aircraft_carrier_name: .asciiz "\nPortaaviones\n"
-dreadnought_name: .asciiz "\nAcorazado\n"
-submarine_name: .asciiz "\nSubmarino\n"
-frigate_name: .asciiz "\nFragata\n"
+aircraft_carrier_name: .asciiz "\nPortaaviones"
+dreadnought_name: .asciiz "\nAcorazado"
+submarine_name: .asciiz "\nSubmarino"
+frigate_name: .asciiz "\nFragata"
 
-sunk_message: .asciiz "¡El barco ha sido hundido: "
-victory_message: .asciiz "¡Todos los barcos han sido hundidos! ¡Ha ganado!"
-
+sunk_message: .asciiz "Ha hundido: "
+victory_message: .asciiz "\n¡Todos los barcos han sido hundidos! ¡Ha ganado!\n"
+punctuation_p1_message: .asciiz "\nPuntuacion jugador 1:"
+punctuation_p2_message: .asciiz "\nPuntuacion jugador 2:"
 achieved:.asciiz "\n Llegue" #<---------DEBUG MESSAGE
  
 .eqv BLUE 0x0000FF
@@ -62,6 +63,8 @@ achieved:.asciiz "\n Llegue" #<---------DEBUG MESSAGE
 
 .eqv AUX $t8
 .eqv AUX2 $t9
+.eqv score_p1 $s5
+.eqv score_p2 $s6
 .text
 
 # Muestro el menu
@@ -70,13 +73,4 @@ main_menu (print_message, read_character,stop_program) # Nos da la eleccion del 
 # Preparo el modo de juego elegido
 initiator () 	# Arma los tableros colocando los barcos y guarda sus posiciones y cada tablero en board_p1 y board_p2
 #Inicio el modo de juego
-#game ()	MACRO 	#Inician los turnos
-
-#Turno del jugador 1
-print_message(message_turn_p1) 
-player_turn (board_p1,board_p2,location_ac2, location_dn2, location_sm2, location_fgt2)
-
-#Turno del jugador 2
-
-print_message(message_turn_p2)
-player_turn (board_p2,board_p1,location_ac1, location_dn1, location_sm1, location_fgt1)
+game()

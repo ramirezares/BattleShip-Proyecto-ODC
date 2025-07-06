@@ -27,7 +27,7 @@
 
 # initiator
 .macro initiator ()
-	move AUX $v0
+	move $s7 $v0
 	#Leo el valor que esta en $v0 para iniciar el juego
 	# Si es 1 es PvP
 	beq $v0 49 pvp
@@ -64,7 +64,7 @@
 	end_initiator:
 .end_macro
 
-.macro player_turn (%player_in_turn_board, %oponent_board, %location_ac, %location_dn, %location_sm, %location_fgt)
+.macro player_turn (%player_in_turn_board, %oponent_board, %location_ac, %location_dn, %location_sm, %location_fgt, %score)
 	#Cargo el tablero del jugador en turno
 	load_board (%player_in_turn_board,display_board) # Carga el valor del tablero del jugador al display
 	# En $s1 guardaré la condición de turno. Si el jugador acierta se mantiene en 1, si falla se iguala a 0
@@ -72,10 +72,10 @@
 	loop_shot:
 		# Muevo el cursor
 		move_cursor (display_board)
-		evaluate_fire (%oponent_board)
+		evaluate_fire (%oponent_board, %score,%location_ac, %location_dn, %location_sm, %location_fgt)
 
 		# Verifica hundidos
-	        check_all_ships_sunk(%location_ac, %location_dn, %location_sm, %location_fgt)
+	        check_all_ships_sunk(%location_ac, %location_dn, %location_sm, %location_fgt,%score)
 	        
 	        #Evaluo si tiene otro acierto
 		beqz $s1 end_loop_shot
@@ -86,4 +86,35 @@
 	#Guardo el tablero al finalizar el turno	
 	save_board (display_board, %player_in_turn_board)
 	
+.end_macro
+
+.macro game ()
+	beq $s7 49 pvp
+	beq $s7 50 pvcpu
+	
+	pvp:
+	pvp_game ()
+	
+	pvcpu:
+	# Colocar aqui la macro del modo de juego PvCPU
+
+.end_macro
+
+
+
+.macro pvp_game ()
+
+	li score_p1 0
+	li score_p2 0
+
+	loop_pvp:
+	#Turno del jugador 1
+	print_message(message_turn_p1) 
+	player_turn (board_p1,board_p2,location_ac2, location_dn2, location_sm2, location_fgt2,score_p1)
+
+	#Turno del jugador 2
+	print_message(message_turn_p2)
+	player_turn (board_p2,board_p1,location_ac1, location_dn1, location_sm1, location_fgt1,score_p2)
+	j loop_pvp
+
 .end_macro

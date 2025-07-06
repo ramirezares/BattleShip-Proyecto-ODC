@@ -127,7 +127,7 @@ end_macro_border_exceded:
     end_move_cursor:
 .end_macro
 
-.macro evaluate_fire (%oponent_board)
+.macro evaluate_fire (%oponent_board,%score,%location_ac, %location_dn, %location_sm, %location_fgt)
 	# En $v0 esta la posicion del disparo resultado del proceso de mover cursor
 	# En $t0 guardaré esa posicion y en $t1 la trasladada
 	move $t0 $v0
@@ -154,8 +154,9 @@ end_macro_border_exceded:
 		
 	successful_shot:
 	print_message(message_successful_shot) #Informo de acierto
-	#Marco en el tablero del jugador el acierto
-	li $t2 RED
+	addi %score %score 1  #Sumo un punto al marcador
+	
+	li $t2 RED	#Marco en el tablero del jugador el acierto
 	sw $t2 display_board($t0)
 	#Marco en el tablero del oponente el acierto
 	li $t2 RED
@@ -164,10 +165,10 @@ end_macro_border_exceded:
 	# Llamar a la macro para colocar el 0 en la posición acertada
 	addi $t0 $t0 1024  # Desplazo la posición ya que no la utilizaré más
 	
-	mark_ship_hit(location_ac2, 5)  # Portaaviones
-	mark_ship_hit(location_dn2, 4)  # Acorazado
-	mark_ship_hit(location_sm2, 3)  # Submarino
-	mark_ship_hit(location_fgt2, 2)  # Fragata
+	mark_ship_hit(%location_ac, 5)  # Portaaviones
+	mark_ship_hit(%location_dn, 4)  # Acorazado
+	mark_ship_hit(%location_sm, 3)  # Submarino
+	mark_ship_hit( %location_fgt, 2)  # Fragata
 	
 	finished_shot:
 .end_macro
@@ -226,17 +227,16 @@ end_macro_border_exceded:
 	    	j loop_check                    # Repite el bucle
 
 	end_check_ship_sunk:
-		beq $t4, %ship_length, ship_sunk # Si todas las posiciones están hundidas, el barco está hundido
+		beq $t4 %ship_length ship_sunk # Si todas las posiciones están hundidas, el barco está hundido
 		j end_check_ship_sunk_done
 
 		ship_sunk:
-				# COLOCAR MENSAJE DE HUNDIDO
 		print_message (%ship_name)     # Imprime el nombre del barco
 		li $v0 0
 	end_check_ship_sunk_done:
 .end_macro
 
-.macro check_all_ships_sunk (%location_ac, %location_dn, %location_sm, %location_fgt)
+.macro check_all_ships_sunk (%location_ac, %location_dn, %location_sm, %location_fgt, %score)
 	# %location_ac: dirección de memoria del Portaaviones
 	# %location_dn: dirección de memoria del Acorazado
 	# %location_sm: dirección de memoria del Submarino
@@ -244,7 +244,8 @@ end_macro_border_exceded:
 
 	# Verifica si cada barco ha sido hundido
 	li $t0 0  #contador
-
+	print_message(sunk_message)
+	print_message(next_line)
 	# Verifica el Portaaviones
 	li $t1, 5                      # Longitud del Portaaviones
 	check_ship_sunk(%location_ac, $t1, aircraft_carrier_name)
@@ -288,6 +289,7 @@ end_macro_border_exceded:
 	li $v0 -1 # Reinicio el valor en $v0
 	
 	end_check_all_ships_sunk:
+	print_message(next_line)
 	# Si todos los barcos están hundidos, termina el juego
     	li $t1, 4                      # Total de barcos
     	beq $t0 $t1 all_ships_sunk   # Si el contador de hundidos es igual al total de barcos
@@ -295,7 +297,12 @@ end_macro_border_exceded:
 	j end_check_all_ships_sunk_done # Si no, termina la verificación
 
 	all_ships_sunk:    # Imprime el mensaje de victoria
+		addi %score %score 20  #Sumo un punto al marcador
     		print_message(victory_message)
+    		print_message(punctuation_p1_message)
+    		print_number (score_p1)
+    		print_message(punctuation_p2_message)
+    		print_number (score_p2)
     		stop_program ()
 
 end_check_all_ships_sunk_done:
