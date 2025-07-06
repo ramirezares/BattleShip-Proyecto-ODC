@@ -74,16 +74,14 @@
 		move_cursor (display_board)
 		evaluate_fire (%oponent_board)
 
-		#Evaluo si tiene otro acierto
-		beqz $s1 end_loop_shot
-		
-		# Verifica si un barco ha sido hundido
+		# Verifica hundidos
 	        check_all_ships_sunk(%location_ac, %location_dn, %location_sm, %location_fgt)
+	        
+	        #Evaluo si tiene otro acierto
+		beqz $s1 end_loop_shot
 		
 		j loop_shot
 	end_loop_shot:
-	
-	#Verifico hundimiento
 	
 	#Guardo el tablero al finalizar el turno	
 	save_board (display_board, %player_in_turn_board)

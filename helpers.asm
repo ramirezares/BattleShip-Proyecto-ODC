@@ -10,10 +10,16 @@
 syscall
 .end_macro
 
+.macro print_number (%number)
+	move $a0 %number
+	li $v0 1
+	syscall
+.end_macro
+
 # Función utilizada para debuggear imprimiendo los numeros
 # que se guardaron en la memoria de los barcos
 .macro print_number_in_memory (%ship_memory) 
-	li $t1 0
+	li $t1 12
 	lw $a0 %ship_memory($t1)
 	li $v0 1
 	syscall

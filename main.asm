@@ -69,13 +69,10 @@ main_menu (print_message, read_character,stop_program) # Nos da la eleccion del 
 
 # Preparo el modo de juego elegido
 initiator () 	# Arma los tableros colocando los barcos y guarda sus posiciones y cada tablero en board_p1 y board_p2
-
 #Inicio el modo de juego
 #game ()	MACRO 	#Inician los turnos
 
 #Turno del jugador 1
-
-
 print_message(message_turn_p1) 
 player_turn (board_p1,board_p2,location_ac2, location_dn2, location_sm2, location_fgt2)
 

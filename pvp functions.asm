@@ -162,6 +162,8 @@ end_macro_border_exceded:
 	sw $t2 %oponent_board($t1)	
 	
 	# Llamar a la macro para colocar el 0 en la posición acertada
+	addi $t0 $t0 1024  # Desplazo la posición ya que no la utilizaré más
+	
 	mark_ship_hit(location_ac2, 5)  # Portaaviones
 	mark_ship_hit(location_dn2, 4)  # Acorazado
 	mark_ship_hit(location_sm2, 3)  # Submarino
@@ -177,7 +179,7 @@ end_macro_border_exceded:
 	# %hit_position: posición que fue acertada
 
 	# En $t0 esta la posición a comparar
-	li $t1 1 # Iterador
+	li $t1 0 # Iterador
 	li $t2 0 # Puntero
 
 	check_hit:
@@ -192,7 +194,7 @@ end_macro_border_exceded:
 		j check_hit                     # Repite el bucle
 
 	hit_found:
-		sw $zero, %ship_memory($t1)     # Coloca un cero en la posición del barco
+		sw $zero, %ship_memory($t2)     # Coloca un cero en la posición del barco
 
 	end_mark_ship_hit:
 .end_macro
@@ -210,16 +212,17 @@ end_macro_border_exceded:
 		#Condicion de parada
 		beq $t3, %ship_length, end_check_ship_sunk # Si hemos revisado todas las posiciones, salir
 
-		lw $t6, %ship_memory($t5)      # Carga la posición del barco
-		beqz $t6, increment_hitted      # Si la posición es 0, cuenta como hundido
+		lw $t6 %ship_memory($t5)      # Carga la posición del barco
+		beqz $t6 increment_hitted      # Si la posición es 0, cuenta como acertado
 		j continue_check                # Si no, continúa
 
 		increment_hitted:
 		addi $t4 $t4 1                # Incrementa el contador de posiciones en 0
 
 		continue_check:
-		addi $t3 $t3 1
+		addi $t3 $t3 1			#Suma al contador de iteración
     		addi $t5, $t5, 4                # Avanza al siguiente espacio de memoria
+
 	    	j loop_check                    # Repite el bucle
 
 	end_check_ship_sunk:
@@ -227,19 +230,17 @@ end_macro_border_exceded:
 		j end_check_ship_sunk_done
 
 		ship_sunk:
-		
-		# COLOCAR MENSAJE DE HUNDIDO
-		
+				# COLOCAR MENSAJE DE HUNDIDO
 		print_message (%ship_name)     # Imprime el nombre del barco
-    
-end_check_ship_sunk_done:
+		li $v0 0
+	end_check_ship_sunk_done:
 .end_macro
 
 .macro check_all_ships_sunk (%location_ac, %location_dn, %location_sm, %location_fgt)
 	# %location_ac: dirección de memoria del Portaaviones
 	# %location_dn: dirección de memoria del Acorazado
 	# %location_sm: dirección de memoria del Submarino
-	# location_fgt: dirección de memoria de la Fragata
+	# %location_fgt: dirección de memoria de la Fragata
 
 	# Verifica si cada barco ha sido hundido
 	li $t0 0  #contador
@@ -251,7 +252,8 @@ end_check_ship_sunk_done:
 	j continue_check
 
 	increment_hitted_ac:
-    	addi $t0, $t0, 1                # Incrementa el contador de barcos hundidos
+    	addi $t0, $t0, 1 # Incrementa el contador de barcos hundidos
+    	li $v0 -1 #Reinicio el valor en $v0
 
 	continue_check:
 	# Verifica el Acorazado
@@ -261,7 +263,8 @@ end_check_ship_sunk_done:
 	j continue_check_dn
 
 	increment_hitted_dn:
-	addi $t0, $t0, 1                # Incrementa el contador de barcos hundidos
+	addi $t0, $t0, 1 # Incrementa el contador de barcos hundidos
+	li $v0 -1 #Reinicio el valor en $v0
 
 	continue_check_dn:	# Verifica el Submarino
 	li $t1, 3                      # Longitud del Submarino
@@ -270,27 +273,30 @@ end_check_ship_sunk_done:
 	j continue_check_sm
 
 	increment_hitted_sm:
-	addi $t0, $t0, 1                # Incrementa el contador de barcos hundidos
+	addi $t0, $t0, 1 # Incrementa el contador de barcos hundidos
+	li $v0 -1 #Reinicio el valor en $v0
 
 	continue_check_sm:	
 	# Verifica la Fragata
 	li $t1, 2                      # Longitud de la Fragata
 	check_ship_sunk(%location_fgt, $t1, frigate_name)
-	beqz $v0, increment_hitted_fgt   # Si no está hundido, incrementa el contador
+	beqz $v0 increment_hitted_fgt   # Si no está hundido, incrementa el contador
 	j end_check_all_ships_sunk
 
 	increment_hitted_fgt:
-	addi $t0, $t0, 1                # Incrementa el contador de barcos hundidos
-
+	addi $t0, $t0, 1 # Incrementa el contador de barcos hundidos
+	li $v0 -1 # Reinicio el valor en $v0
+	
 	end_check_all_ships_sunk:
 	# Si todos los barcos están hundidos, termina el juego
     	li $t1, 4                      # Total de barcos
-    	beq $t0, $t1, all_ships_sunk   # Si el contador de hundidos es igual al total de barcos
+    	beq $t0 $t1 all_ships_sunk   # Si el contador de hundidos es igual al total de barcos
 
 	j end_check_all_ships_sunk_done # Si no, termina la verificación
 
 	all_ships_sunk:    # Imprime el mensaje de victoria
-    	print_message(victory_message)
+    		print_message(victory_message)
+    		stop_program ()
 
 end_check_all_ships_sunk_done:
 .end_macro
