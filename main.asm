@@ -41,9 +41,10 @@ ask_move: .asciiz "\nElija la ubicacion:\nA->Mover a la izquierda.\nD->Mover a l
 ask_fire: .asciiz "\nElija la ubicacion donde desea disparar:\nA->Mover a la izquierda.\nD->Mover a la derecha.\nW->Mover hacia arriba.\nS->Mover hacia abajo.\n\nCon enter acepta la posición de disparo.\n"
 invalid_fire: .asciiz "Disparo invalido. Seleccione una ubicacion a la que no haya disparado antes"
 message_successful_shot: .asciiz "\n¡Disparo exitoso!\n"
-message_fail_shot: .asciiz "\nDisparo fallido D: \n"
+message_fail_shot: .asciiz "\n¡Disparo fallido! \n"
 message_turn_p1: .asciiz "\nTurno del jugador 1\n"
 message_turn_p2: .asciiz "\nTurno del jugador 2\n"
+message_turn_CPU: .asciiz "\nTurno de la CPU\n"
 
 aircraft_carrier_name: .asciiz "\nPortaaviones"
 dreadnought_name: .asciiz "\nAcorazado"
