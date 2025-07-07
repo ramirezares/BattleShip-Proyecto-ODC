@@ -4,6 +4,7 @@
 .include "helpers.asm"
 .include "start functions.asm"
 .include "pvp functions.asm"
+.include "pvcpu functions.asm"
 .include "menus.asm"
 
 .data
@@ -15,10 +16,10 @@ board_p2: .space 2048
 # Espacios de los barcos     
 
 #Player 1
-location_ac1: .space 20	# Portaaviones = Aircraft Carrier = ac. Tamaño: 5
-location_dn1: .space 16	# dreadnought = Acorazado = dn. Tamaño: 4 
+location_ac1: .space 20	# Aircraft Carrier =Portaaviones = ac. Tamaño: 5
+location_dn1: .space 16	# Dreadnought = Acorazado = dn. Tamaño: 4 
 location_sm1: .space 12  # Submarine = Submarino = sm. Tamaño: 3
-location_fgt1: .space 8  # Frigate = fragata = fgt.  Tamaño: 2
+location_fgt1: .space 8  # Frigate = Fragata = fgt.  Tamaño: 2
 
 #Player 2
 location_ac2: .space 20	# Portaaviones = Aircraft Carrier = ac.  Tamaño: 5
@@ -35,6 +36,7 @@ ask_mode: .asciiz "\nIngrese el número del modo de juego o 0 para salir: "
 next_line:.asciiz "\n"
 initialize_board_p1: .asciiz "\n	Jugador 1. Ubique cada uno de sus barcos:"
 initialize_board_p2: .asciiz "\n	Jugador 2. Ubique cada uno de sus barcos:"
+initialize_board_cpu: .asciiz "\n	La CPU esta ubicando sus barcos."
 ask_move: .asciiz "\nElija la ubicacion:\nA->Mover a la izquierda.\nD->Mover a la derecha.\nW->Mover hacia arriba.\nS->Mover hacia abajo.\n\nCon R puede rotar el barco y con enter acepta la posición.\n"
 ask_fire: .asciiz "\nElija la ubicacion donde desea disparar:\nA->Mover a la izquierda.\nD->Mover a la derecha.\nW->Mover hacia arriba.\nS->Mover hacia abajo.\n\nCon enter acepta la posición de disparo.\n"
 invalid_fire: .asciiz "Disparo invalido. Seleccione una ubicacion a la que no haya disparado antes"
@@ -54,10 +56,10 @@ punctuation_p1_message: .asciiz "\nPuntuacion jugador 1:"
 punctuation_p2_message: .asciiz "\nPuntuacion jugador 2:"
 achieved:.asciiz "\n Llegue" #<---------DEBUG MESSAGE
  
-.eqv BLUE 0x0000FF
+.eqv BLUE 0x0e2ea8
 .eqv blue 0x87CEFA
-.eqv GRAY 0x808080
-.eqv RED 0xFF0000
+.eqv GRAY 0x6e8198
+.eqv RED 0xc0162b
 .eqv WHITE 0xFFFFFF
 .eqv YELLOW 0xFFFF00
 
