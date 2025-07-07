@@ -25,14 +25,15 @@
 	
 	loop_4:	#Bucle para mover el barco a colocar
 	#CAMBIAR CANTIDAD DE MOVIMIENTOS
-		beq $s4 3 enter
-		
-		li $a0, 97       # Límite inferior 
-		li $a1, 120		# Límite superior 
+		beq $s4 26 enter
+		li $a1, 23	# Límite superior  rango(0-21)
 		li $v0, 42        # Syscall 42: Generar número aleatorio
 		syscall
 		
-		move $v0, $a0     # Guarda el número aleatorio en $t0
+		move $v0, $a0     # Guarda el número aleatorio en $v0
+		addi $v0, $v0, 97
+		#v0 van a ser número entre 97 y 119
+		
 		
 		beq $v0 97 left
 		beq $v0 100 right
@@ -203,9 +204,10 @@
 	
 	# En $s1 guardaré la condición de turno. Si el jugador acierta se mantiene en 1, si falla se iguala a 0
 	li $s1 1 #Condicion de tiro
+	
 	loop_shot:
 		# Muevo el cursor
-		move_cursor (display_board)
+		move_cursor_random(board_p2)
 		evaluate_fire (%oponent_board, %score,%location_ac, %location_dn, %location_sm, %location_fgt)
 
 		# Verifica hundidos
@@ -217,4 +219,107 @@
 		j loop_shot
 	end_loop_shot:
 	
+.end_macro
+
+
+.macro move_cursor_random (%player_table)
+    li $t0 0		# Inicializa la posición del cursor en el inicio del tablero
+    li $t1 0		# Inicializa el iterador para el movimiento
+    li $s4 0 	#inicializa iterador de cantidad de movimientos
+    
+    loop_move:
+	lw $t2 board_p2($t0)  #Color actual del cursor. Tomo el color que esta en la casilla    	
+        li $t3 YELLOW
+        place_cursor(board_p2, $t3, $t0)  # Pinta el cursor en la posición actual
+        print_message(ask_fire)  # Muestra el mensaje para elegir la posicion para disparar moviendo el cursor
+        
+        beq $s4 50  select_position
+		li $a1, 23	# Límite superior  rango(0-21)
+		li $v0, 42        # Syscall 42: Generar número aleatorio
+		syscall
+		
+	move $v0, $a0     # Guarda el número aleatorio en $v0
+	addi $v0, $v0,97
+	#v0 van a ser número entre 97 y 119
+	
+        # Mover el cursor según la entrada
+        beq $v0, 97, move_left    # 'A' para mover a la izquierda
+        beq $v0, 100, move_right   # 'D' para mover a la derecha
+        beq $v0, 119, move_up      # 'W' para mover hacia arriba
+        beq $v0, 115, move_down    # 'S' para mover hacia abajo
+        j continue_move            # Continúa el bucle
+
+	enter:
+	
+	move_left:
+		move $t3 $t2	
+		place_cursor(display_board, $t3, $t0) #Pinto el cuadro del color que estaba
+	
+		move AUX $t0		#Guardo la posicion para validar
+	        validate_border (0)
+        	addi $t0 $t0 -4 		# Avanzo con el cursor hacia la izquierda
+	        blt $t0 $v0 left_exceded        
+        	j continue_move
+        
+        left_exceded:
+	        move $t0 AUX
+        	j continue_move
+        
+	move_right:
+		move $t3 $t2	
+		place_cursor(display_board, $t3, $t0) #Pinto el cuadro del color que estaba
+	
+		move AUX $t0	#Guardo la posicion para validar
+		validate_border (1)
+	        addi $t0 $t0 4           # Avanzo con el cursor a la derecha
+        	bgt $t0 $v0 right_exceded
+	        j continue_move
+        
+        right_exceded:
+        	move $t0 AUX
+	        j continue_move
+        
+	move_up:    	
+		move $t3 $t2	
+		place_cursor(display_board, $t3, $t0) #Pinto el cuadro del color que estaba
+		
+		move AUX $t0	#Guardo la posicion para validar
+		addi $t0, $t0, -64         # Mueve el cursor hacia arriba
+		blt $t0 0 up_exceded 
+		j continue_move
+		
+	up_exceded:
+		move $t0 AUX
+	        j continue_move
+
+	move_down:
+		move $t3 $t2	
+		place_cursor(display_board, $t3, $t0) #Pinto el cuadro del color que estaba
+		
+		move AUX $t0		#Guardo la posicion para validar
+	        addi $t0, $t0, 64          # Avanzo con el cursor hacia abajo
+	        bgt $t0 1020 down_exceded
+        	j continue_move
+
+	down_exceded:
+		move $t0 AUX
+	        j continue_move
+
+    select_position:    
+    	move $t3 $t2	
+	place_cursor(display_board, $t3, $t0) #Pinto el cuadro del color que estaba	
+	
+    	bne $t2 blue not_valid_fire
+
+        move $v0, $t0              # Guarda la posición seleccionada en $v0 si la posicion es valida para disparo
+        j end_move_cursor           # Salir del bucle
+        
+        not_valid_fire:
+        print_message(invalid_fire)
+        print_message(next_line)
+
+    continue_move:
+    	addi $s4 $s4 1
+        j loop_move
+    end_move_cursor:
 .end_macro

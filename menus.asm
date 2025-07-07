@@ -132,13 +132,46 @@
 	li score_p2 0
 
 	loop_pvp:
+	j turn_p1
+	
+	#repetición de Turno
+	play_again1:
+	print_message(message_comodin)
+	 
 	#Turno del jugador 1
+	turn_p1:
+	print_message (next_line)
 	print_message(message_turn_p1) 
 	player_turn (board_p1,board_p2,location_ac2, location_dn2, location_sm2, location_fgt2,score_p1)
-
+	
+	#Aplicación del comodín: 1 de cada 10 veces, hay chance de que vuelva a hacer el turno del jugador que acaba de fallar el tiro
+		li $a1, 10	# Límite superior 
+		li $v0, 42        # Syscall 42: Generar número aleatorio
+		syscall
+		move $t8, $a0
+		print_number($t8) 
+		beq $t8 7 play_again1
+		
+	#turno del segundo jugador	
+	j turn_p2
+	#repetición de Turno
+	play_again2:
+	print_message(message_comodin) 
 	#Turno del jugador 2
+	turn_p2:
+	print_message (next_line)
 	print_message(message_turn_p2)
 	player_turn (board_p2,board_p1,location_ac1, location_dn1, location_sm1, location_fgt1,score_p2)
+	
+	#Aplicación del comodín: 1 de cada 10 veces, hay chance de que vuelva a hacer el turno del jugador que acaba de fallar el tiro
+		li $a1, 10		# Límite superior 
+		li $v0, 42        # Syscall 42: Generar número aleatorio
+		syscall
+		
+		move $t8, $a0
+		print_number($t8) 
+		beq $t8 7 play_again2
+	
 	j loop_pvp
 
 .end_macro
@@ -150,16 +183,33 @@
 	li score_p1 0
 	li score_p2 0
 
-	loop_pvp:
+	loop_pvCPU:
 	#Turno del jugador 1
-	print_message(message_turn_p1) 
-	player_turn (display_board,board_p2,location_ac2, location_dn2, location_sm2, location_fgt2,score_p1)
+	j turn_p3
+	
+	#Repetición de turno
+	play_again3:
+	print_message(message_comodin) 
+	
+	#Turno del jugador 1
+	turn_p3:
+		print_message(message_turn_p1) 
+		player_turn (display_board,board_p2,location_ac2, location_dn2, location_sm2, location_fgt2,score_p1)
+	
+	#Aplicación del comodín: 1 de cada 10 veces, hay chance de que vuelva a hacer el turno del jugador que acaba de fallar el tiro
+		li $a1, 10		# Límite superior 
+		li $v0, 42        # Syscall 42: Generar número aleatorio
+		syscall
+		
+		move $t8, $a0
+		print_number($t8) 
+		beq $t8 7 play_again3
 
 	#Turno del CPU
-	print_message(message_turn_p2)
-	player_turn (board_p2,display_board,location_ac1, location_dn1, location_sm1, location_fgt1,score_p2)
+	print_message(message_turn_CPU)
+	CPU_turn(board_p2,display_board,location_ac1, location_dn1, location_sm1, location_fgt1,score_p2)
 	
-	j loop_pvp
+	j loop_pvCPU
 
 .end_macro
 

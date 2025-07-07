@@ -45,6 +45,7 @@ message_fail_shot: .asciiz "\n¡Disparo fallido! \n"
 message_turn_p1: .asciiz "\nTurno del jugador 1\n"
 message_turn_p2: .asciiz "\nTurno del jugador 2\n"
 message_turn_CPU: .asciiz "\nTurno de la CPU\n"
+message_comodin: .asciiz "\nAAAAAAAAAAAAAAAAAAAAAAAAAA¡Ganaste el comodín, vuelve a jugar! \n"
 
 aircraft_carrier_name: .asciiz "\nPortaaviones"
 dreadnought_name: .asciiz "\nAcorazado"
