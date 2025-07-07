@@ -180,9 +180,8 @@ end_macro_border_exceded:
 
 	li $t2 GRAY #Color gris
 	print_ship_space (%board,$t2,$s1,$s2,%ship_memory)
-
+	print_message (ask_move)
 	loop_4:	#Bucle para mover el barco a colocar
-		print_message (ask_move)
 		read_character ()
 		beq $v0 97 left
 		beq $v0 100 right

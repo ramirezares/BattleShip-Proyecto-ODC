@@ -39,12 +39,12 @@ end_macro_border_exceded:
 .macro move_cursor (%player_table)
     li $t0 0		# Inicializa la posición del cursor en el inicio del tablero
     li $t1 0		# Inicializa el iterador para el movimiento
+    print_message(ask_fire)  # Muestra el mensaje para elegir la posicion para disparar moviendo el cursor
     
     loop_move:
 	lw $t2 display_board($t0)  #Color actual del cursor. Tomo el color que esta en la casilla    	
         li $t3 YELLOW
         place_cursor(display_board, $t3, $t0)  # Pinta el cursor en la posición actual
-        print_message(ask_fire)  # Muestra el mensaje para elegir la posicion para disparar moviendo el cursor
         read_character()          # Lee la entrada del usuario
 
         # Mover el cursor según la entrada
