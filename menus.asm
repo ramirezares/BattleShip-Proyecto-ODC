@@ -30,7 +30,9 @@
 	move $s7 $v0
 	#Leo el valor que esta en $v0 para iniciar el juego
 	# Si es 1 es PvP
-	beq $v0 49 pvp
+	beq $v0 49 pvp #49 es el equivalente al número 1 en ASCII
+	beq $v0 50 pvcpu #50 es el equivalente al número 2 en ASCII
+	
 	
 	pvp:
 	#El primer jugador arma su tablero
@@ -52,14 +54,36 @@
 	place_boat (display_board, 3 ,location_sm2) 	
 	place_boat (display_board, 2 ,location_fgt2)
 	save_board (display_board, board_p2) 
-
-	# Si es 2 es PvCPU
-		#Logica PvCPU
 	
 	j end_initiator
 
+
+	# Si es 2 es PvCPU
 	pvcpu:
-		#Colocar PvCPU
+		#El primer jugador arma su tablero
+		print_message (next_line) #\n
+		print_message (initialize_board_p1)
+		print_ocean(display_board)
+		place_boat (display_board, 5 ,location_ac1) #Colocamos cada barco y guardamos su posicion
+		place_boat (display_board, 4 ,location_dn1) 
+		place_boat (display_board, 3 ,location_sm1) 	
+		place_boat (display_board, 2 ,location_fgt1)
+		
+		#REVISAR EN DONDE SE HACE EL CAMBIO DEL BOARD2 PARA SOLO DEJAR EL DISPLAYBOARD
+		#save_board (display_board, board_p1) Guardar tablero en otro espacio de memoria
+
+		#El CPU  arma su tablero
+		print_message (next_line)#\n
+		print_message (initialize_board_cpu)
+		print_ocean(board_p2)
+		
+		#Colocamos cada barco y guardamos su posicion
+		CPU_place_boat (board_p2, 5 ,location_ac2)
+		CPU_place_boat (board_p2, 4 ,location_dn2) 
+		CPU_place_boat (board_p2, 3 ,location_sm2) 	
+		CPU_place_boat (board_p2, 2 ,location_fgt2)
+		
+	j end_initiator
 
 	end_initiator:
 .end_macro
@@ -96,7 +120,7 @@
 	pvp_game ()
 	
 	pvcpu:
-	# Colocar aqui la macro del modo de juego PvCPU
+	pvcpu_game ()
 
 .end_macro
 
@@ -118,3 +142,24 @@
 	j loop_pvp
 
 .end_macro
+
+
+
+.macro pvcpu_game ()
+
+	li score_p1 0
+	li score_p2 0
+
+	loop_pvp:
+	#Turno del jugador 1
+	print_message(message_turn_p1) 
+	player_turn (display_board,board_p2,location_ac2, location_dn2, location_sm2, location_fgt2,score_p1)
+
+	#Turno del CPU
+	print_message(message_turn_p2)
+	player_turn (board_p2,display_board,location_ac1, location_dn1, location_sm1, location_fgt1,score_p2)
+	
+	j loop_pvp
+
+.end_macro
+
