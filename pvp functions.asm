@@ -43,6 +43,7 @@ end_macro_border_exceded:
     
     loop_move:
 	lw $t2 display_board($t0)  #Color actual del cursor. Tomo el color que esta en la casilla    	
+        move AUX2 $t2
         li $t3 YELLOW
         place_cursor(display_board, $t3, $t0)  # Pinta el cursor en la posición actual
         read_character()          # Lee la entrada del usuario
@@ -53,21 +54,22 @@ end_macro_border_exceded:
         beq $v0, 119, move_up      # 'W' para mover hacia arriba
         beq $v0, 115, move_down    # 'S' para mover hacia abajo
         beq $v0, 10, select_position # Enter para seleccionar la posición
-        j continue_move            # Continúa el bucle
-
+        
+        j continue_move            # Continúa el bucle si no selecciono ninguna 
+	
 	move_left:
 		move $t3 $t2	
 		place_cursor(display_board, $t3, $t0) #Pinto el cuadro del color que estaba
 	
 		move AUX $t0		#Guardo la posicion para validar
 	        validate_border (0)
-        	addi $t0 $t0 -4 		# Avanzo con el cursor hacia la izquierda
+        		addi $t0 $t0 -4 		# Avanzo con el cursor hacia la izquierda
 	        blt $t0 $v0 left_exceded        
-        	j continue_move
+        		j loop_move
         
         left_exceded:
 	        move $t0 AUX
-        	j continue_move
+        	j loop_move
         
 	move_right:
 		move $t3 $t2	
@@ -76,12 +78,12 @@ end_macro_border_exceded:
 		move AUX $t0	#Guardo la posicion para validar
 		validate_border (1)
 	        addi $t0 $t0 4           # Avanzo con el cursor a la derecha
-        	bgt $t0 $v0 right_exceded
-	        j continue_move
+		bgt $t0 $v0 right_exceded
+	        j loop_move
         
         right_exceded:
         	move $t0 AUX
-	        j continue_move
+	        j loop_move
         
 	move_up:    	
 		move $t3 $t2	
@@ -90,11 +92,11 @@ end_macro_border_exceded:
 		move AUX $t0	#Guardo la posicion para validar
 		addi $t0, $t0, -64         # Mueve el cursor hacia arriba
 		blt $t0 0 up_exceded 
-		j continue_move
+		j loop_move
 		
 	up_exceded:
 		move $t0 AUX
-	        j continue_move
+	        j loop_move
 
 	move_down:
 		move $t3 $t2	
@@ -103,27 +105,32 @@ end_macro_border_exceded:
 		move AUX $t0		#Guardo la posicion para validar
 	        addi $t0, $t0, 64          # Avanzo con el cursor hacia abajo
 	        bgt $t0 1020 down_exceded
-        	j continue_move
+        	j loop_move
 
 	down_exceded:
 		move $t0 AUX
-	        j continue_move
+	        j loop_move
 
-    select_position:    
-    	move $t3 $t2	
-	place_cursor(display_board, $t3, $t0) #Pinto el cuadro del color que estaba	
+    	select_position:    
+    		move $t3 $t2	
+		place_cursor(display_board, $t3, $t0) #Pinto el cuadro del color que estaba	
 	
-    	bne $t2 blue not_valid_fire
+    		bne $t2 blue not_valid_fire
 
-        move $v0, $t0              # Guarda la posición seleccionada en $v0 si la posicion es valida para disparo
-        j end_move_cursor           # Salir del bucle
+        		move $v0, $t0              # Guarda la posición seleccionada en $v0 si la posicion es valida para disparo
+        		j end_move_cursor           # Salir del bucle
         
-        not_valid_fire:
-        print_message(invalid_fire)
-        print_message(next_line)
-
-    continue_move:
+        		not_valid_fire:
+        		print_message(invalid_fire)
+        		print_message(next_line)
+		j loop_move
+		
+    	continue_move:
+	move $t3 AUX2
+        place_cursor(display_board, $t3, $t0)  # Reestablezco el cursor en la posición actual
+    	
         j loop_move
+        
     end_move_cursor:
 .end_macro
 

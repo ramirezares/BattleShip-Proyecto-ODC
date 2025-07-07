@@ -25,7 +25,7 @@
 	
 	loop_4:	#Bucle para mover el barco a colocar
 	#CAMBIAR CANTIDAD DE MOVIMIENTOS
-		beq $s4 26 enter
+		beq $s4 40 enter
 		li $a1, 23	# Límite superior  rango(0-21)
 		li $v0, 42        # Syscall 42: Generar número aleatorio
 		syscall
@@ -207,8 +207,8 @@
 	
 	loop_shot:
 		# Muevo el cursor
-		move_cursor_random(board_p2)
-		evaluate_fire (%oponent_board, %score,%location_ac, %location_dn, %location_sm, %location_fgt)
+		move_cursor_random()
+		evaluate_fire_random(%oponent_board, %score,%location_ac, %location_dn, %location_sm, %location_fgt)
 
 		# Verifica hundidos
 	        check_all_ships_sunk(%location_ac, %location_dn, %location_sm, %location_fgt,%score)
@@ -222,104 +222,161 @@
 .end_macro
 
 
-.macro move_cursor_random (%player_table)
+.macro move_cursor_random ()
     li $t0 0		# Inicializa la posición del cursor en el inicio del tablero
     li $t1 0		# Inicializa el iterador para el movimiento
-    li $s4 0 	#inicializa iterador de cantidad de movimientos
-    
+    li $s4 0 
     loop_move:
 	lw $t2 board_p2($t0)  #Color actual del cursor. Tomo el color que esta en la casilla    	
+        move AUX2 $t2
         li $t3 YELLOW
         place_cursor(board_p2, $t3, $t0)  # Pinta el cursor en la posición actual
-        print_message(ask_fire)  # Muestra el mensaje para elegir la posicion para disparar moviendo el cursor
         
-        beq $s4 50  select_position
-		li $a1, 23	# Límite superior  rango(0-21)
-		li $v0, 42        # Syscall 42: Generar número aleatorio
-		syscall
+        print_message (next_line)
+        print_number( $s4) 
+        
+        beq $s4 40  select_position
+	
+	li $a1, 23	# Límite superior  rango(0-22)
+	li $v0, 42        # Syscall 42: Generar número aleatorio
+	syscall
 		
 	move $v0, $a0     # Guarda el número aleatorio en $v0
 	addi $v0, $v0,97
 	#v0 van a ser número entre 97 y 119
-	
+
         # Mover el cursor según la entrada
         beq $v0, 97, move_left    # 'A' para mover a la izquierda
         beq $v0, 100, move_right   # 'D' para mover a la derecha
         beq $v0, 119, move_up      # 'W' para mover hacia arriba
         beq $v0, 115, move_down    # 'S' para mover hacia abajo
-        j continue_move            # Continúa el bucle
-
-	enter:
+        
+        j continue_move            # Continúa el bucle si no selecciono ninguna 
 	
 	move_left:
 		move $t3 $t2	
-		place_cursor(display_board, $t3, $t0) #Pinto el cuadro del color que estaba
+		place_cursor(board_p2, $t3, $t0) #Pinto el cuadro del color que estaba
 	
 		move AUX $t0		#Guardo la posicion para validar
 	        validate_border (0)
-        	addi $t0 $t0 -4 		# Avanzo con el cursor hacia la izquierda
-	        blt $t0 $v0 left_exceded        
-        	j continue_move
+        		addi $t0 $t0 -4 		# Avanzo con el cursor hacia la izquierda
+	        blt $t0 $v0 left_exceded        		
+		addi $s4 $s4 1	
+        		j loop_move
         
         left_exceded:
 	        move $t0 AUX
-        	j continue_move
+        	j loop_move
         
 	move_right:
 		move $t3 $t2	
-		place_cursor(display_board, $t3, $t0) #Pinto el cuadro del color que estaba
+		place_cursor(board_p2, $t3, $t0) #Pinto el cuadro del color que estaba
 	
 		move AUX $t0	#Guardo la posicion para validar
 		validate_border (1)
 	        addi $t0 $t0 4           # Avanzo con el cursor a la derecha
-        	bgt $t0 $v0 right_exceded
-	        j continue_move
+		bgt $t0 $v0 right_exceded
+		addi $s4 $s4 1
+	        j loop_move
         
         right_exceded:
         	move $t0 AUX
-	        j continue_move
+	        j loop_move
         
 	move_up:    	
 		move $t3 $t2	
-		place_cursor(display_board, $t3, $t0) #Pinto el cuadro del color que estaba
+		place_cursor(board_p2, $t3, $t0) #Pinto el cuadro del color que estaba
 		
 		move AUX $t0	#Guardo la posicion para validar
 		addi $t0, $t0, -64         # Mueve el cursor hacia arriba
 		blt $t0 0 up_exceded 
-		j continue_move
+		addi $s4 $s4 1
+		j loop_move
 		
 	up_exceded:
 		move $t0 AUX
-	        j continue_move
+	        j loop_move
 
 	move_down:
 		move $t3 $t2	
-		place_cursor(display_board, $t3, $t0) #Pinto el cuadro del color que estaba
+		place_cursor(board_p2, $t3, $t0) #Pinto el cuadro del color que estaba
 		
 		move AUX $t0		#Guardo la posicion para validar
 	        addi $t0, $t0, 64          # Avanzo con el cursor hacia abajo
 	        bgt $t0 1020 down_exceded
-        	j continue_move
+	        addi $s4 $s4 1
+        	j loop_move
 
 	down_exceded:
 		move $t0 AUX
-	        j continue_move
+	        j loop_move
 
-    select_position:    
-    	move $t3 $t2	
-	place_cursor(display_board, $t3, $t0) #Pinto el cuadro del color que estaba	
+    	select_position:    
+    		move $t3 $t2	
+		place_cursor(board_p2, $t3, $t0) #Pinto el cuadro del color que estaba	
 	
-    	bne $t2 blue not_valid_fire
+    		bne $t2 blue not_valid_fire
 
-        move $v0, $t0              # Guarda la posición seleccionada en $v0 si la posicion es valida para disparo
-        j end_move_cursor           # Salir del bucle
+        		move $v0, $t0              # Guarda la posición seleccionada en $v0 si la posicion es valida para disparo
+        		j   end_move_cursor_random           # Salir del bucle
         
-        not_valid_fire:
-        print_message(invalid_fire)
-        print_message(next_line)
+        		not_valid_fire:
+        		print_message(invalid_fire)
+        		print_message(next_line)
+        		li $s4 0
+        		j loop_move
 
-    continue_move:
-    	addi $s4 $s4 1
+    	continue_move:
+	move $t3 AUX2
+        place_cursor(board_p2, $t3, $t0)  # Reestablezco el cursor en la posición actual
+    	
         j loop_move
-    end_move_cursor:
+        
+    end_move_cursor_random:
+.end_macro
+
+.macro evaluate_fire_random (%oponent_board,%score,%location_ac, %location_dn, %location_sm, %location_fgt)
+	# En $v0 esta la posicion del disparo resultado del proceso de mover cursor
+	# En $t0 guardaré esa posicion y en $t1 la trasladada
+	move $t0 $v0
+	addi $t1 $v0 1024 
+	
+	 lw $t2 %oponent_board($t1)	 #Cargo el valor de color de la posicion indicada trasladada a la parte de abajo del tablero del oponente
+	
+	# Si en el tablero del oponente en la parte de abajo en la posicion indicada hay un barco (color gris)
+	# se debe marcar en rojo el tablero de tiro del jugador y el tablero de los barcos del oponente
+	 beq $t2 GRAY successful_shot
+		
+	# Si no se debe marcar en blanco (Buscar color distinto) el tablero de tiro y en COLOR el tablero del oponente
+	# Marco en el tablero del jugador el fallo
+	print_message(message_fail_shot) #Informo de fallo
+	li $t2 WHITE
+	sw $t2 board_p2($t0)
+	# Marco en el tablero del oponente el fallo
+	li $t2 WHITE
+	sw $t2 %oponent_board($t1)	
+	
+	# Como falló se acaba su turno
+	li $s1 0 #Condicion de tiro
+	j finished_shot_random
+		
+	successful_shot:
+	print_message(message_successful_shot) #Informo de acierto
+	addi %score %score 1  #Sumo un punto al marcador
+	
+	li $t2 RED	#Marco en el tablero del jugador el acierto
+	sw $t2 board_p2($t0)
+	#Marco en el tablero del oponente el acierto
+	li $t2 RED
+	sw $t2 %oponent_board($t1)	
+	
+	# Llamar a la macro para colocar el 0 en la posición acertada
+	addi $t0 $t0 1024  # Desplazo la posición ya que no la utilizaré más
+	
+	mark_ship_hit(%location_ac, 5)  # Portaaviones
+	mark_ship_hit(%location_dn, 4)  # Acorazado
+	mark_ship_hit(%location_sm, 3)  # Submarino
+	mark_ship_hit( %location_fgt, 2)  # Fragata
+	
+	finished_shot_random:
 .end_macro
