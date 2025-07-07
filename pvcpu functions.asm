@@ -232,8 +232,8 @@
         li $t3 YELLOW
         place_cursor(board_p2, $t3, $t0)  # Pinta el cursor en la posición actual
         
-        print_message (next_line)
-        print_number( $s4) 
+        #print_message (next_line)
+        #print_number( $s4)  Numero de iteración 
         
         beq $s4 40  select_position
 	

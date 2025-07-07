@@ -149,7 +149,7 @@
 		li $v0, 42        # Syscall 42: Generar número aleatorio
 		syscall
 		move $t8, $a0
-		print_number($t8) 
+		#print_number($t8) 
 		beq $t8 7 play_again1
 		
 	#turno del segundo jugador	
@@ -169,7 +169,7 @@
 		syscall
 		
 		move $t8, $a0
-		print_number($t8) 
+		#print_number($t8) 
 		beq $t8 7 play_again2
 	
 	j loop_pvp
@@ -202,7 +202,7 @@
 		syscall
 		
 		move $t8, $a0
-		print_number($t8) 
+		#print_number($t8) 
 		beq $t8 7 play_again3
 
 	#Turno del CPU
