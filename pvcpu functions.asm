@@ -321,7 +321,6 @@
         		j   end_move_cursor_random           # Salir del bucle
         
         		not_valid_fire:
-        		print_message(invalid_fire)
         		print_message(next_line)
         		li $s4 0
         		j loop_move
